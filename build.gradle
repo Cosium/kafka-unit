@@ -58,9 +58,13 @@ uploadArchives {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://repo.cosium.com/repository/internal/")
+            repository(url: "https://repo.cosium.com/repository/internal/") {
+                authentication(userName: mavenUser, password: mavenPassword)
+            }
 
-            snapshotRepository(url: "https://repo.cosium.com/repository/snapshots/")
+            snapshotRepository(url: "https://repo.cosium.com/repository/snapshots/") {
+                authentication(userName: mavenUser, password: mavenPassword)
+            }
 
             pom.project {
                 name 'Kafka Unit'
