@@ -186,23 +186,28 @@ public class KafkaUnit {
                 30000, 30000, JaasUtils.isZkSecurityEnabled());
 
         // run
-        LOGGER.info("Executing: ListTopics " + Arrays.toString(arguments));
         final List<String> topics = new ArrayList<>();
-        PrintStream oldOut = Console.out();
         try{
-            Console.setOut(new PrintStream(oldOut){
-                @Override
-                public void print(String s) {
-                    super.print(s);
-                    if(!s.endsWith("marked for deletion")){
-                        topics.add(s);
-                    }
-                }
-            });
-            TopicCommand.listTopics(zkUtils, opts);
-        } finally {
-            Console.setOut(oldOut);
-        }
+			LOGGER.info("Executing: ListTopics " + Arrays.toString(arguments));
+			PrintStream oldOut = Console.out();
+			try{
+				Console.setOut(new PrintStream(oldOut){
+					@Override
+					public void print(String s) {
+						super.print(s);
+						if(!s.endsWith("marked for deletion")){
+							topics.add(s);
+						}
+					}
+				});
+				TopicCommand.listTopics(zkUtils, opts);
+			} finally {
+				Console.setOut(oldOut);
+			}
+		} finally {
+        	zkUtils.close();
+		}
+
         return topics;
     }
 
@@ -232,10 +237,13 @@ public class KafkaUnit {
 
         ZkUtils zkUtils = ZkUtils.apply(opts.options().valueOf(opts.zkConnectOpt()),
                 30000, 30000, JaasUtils.isZkSecurityEnabled());
-
-        // run
-        LOGGER.info("Executing: DeleteTopic " + Arrays.toString(arguments));
-        TopicCommand.deleteTopic(zkUtils, opts);
+		try{
+			// run
+			LOGGER.info("Executing: DeleteTopic " + Arrays.toString(arguments));
+			TopicCommand.deleteTopic(zkUtils, opts);
+		} finally {
+			zkUtils.close();
+		}
     }
 
     public void shutdown() {
