@@ -17,6 +17,10 @@ targetCompatibility = 1.7
 
 group = 'info.batey.kafka'
 
+release{
+    requireBranch = null
+}
+
 jar {
     baseName = 'kafka-unit'
 }
